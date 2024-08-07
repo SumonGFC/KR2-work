@@ -4,13 +4,13 @@
  * Exercise 4-4. Add the commands to print the top elements of the stack
  * without popping, to duplicate it, and to swap the top two elements. Add a
  * command to clear the stack.
- * 
+ *
  * Exercise 4-5. Add access to library functions like sin, exp, and pow. See
  * <math.h> in Appendix B, Section 4.
  *
  * Exercise 4-6. Add commands for handling variables. (It's easy to provide
  * twenty-six variables with single-letter names.) Add a variable for the most
- * recently printed value. 
+ * recently printed value.
  */
 
 #include <stdio.h>
@@ -75,9 +75,9 @@ int main(void)
 // pop(): Pop operand from stack
 #define MAXVAL 100      // max stack depth
 
-// declarations for push() and pop()
-int sp = 0;             // stack ptr -- EXTERNAL
-double val[MAXVAL];     // value (operand) stack -- EXTERNAL
+// EXTERNAL declarations for push() and pop()
+int sp = 0;
+double val[MAXVAL];
 
 void push(double f)
 {
@@ -108,16 +108,25 @@ int getop(char s[])
 {
         int i, c;
 
-        // skip white space and check if input char is not a number
+        // skip leading white space and check if input char is not a number
         while ((s[0] = c = getch()) == ' ' || c == '\t')
                 ;
         s[1] = '\0';
 
-        if (!isdigit(c) && c != '.')
+        if (!isdigit(c) && c != '.' && c != '-')
                 return c;
 
         // collect integer (and fractional if necessary)
         i = 0;
+        // EXERCISE 4-3
+        if (c == '-') {
+                if (!isdigit(s[++i] = c = getch()) && c != '.') {
+                        if (c != EOF)
+                                ungetch(c);
+                        return s[0];
+                }
+        }
+
         if (isdigit(c))
                 while (isdigit(s[++i] = c = getch()))
                         ;
