@@ -18,11 +18,20 @@
 
 #define MAXOP 100
 #define NUMBER '0'
+#define TOP '!'
+#define DUP '@'
+#define SWAP '#'
 
 // declarations for main
 int getop(char[]);
 void push(double);
 double pop(void);
+// EXERCISE 4-4 (declarations)
+void print_stack(void);
+void top(void);
+void dup(void);
+void swap(void);
+void clear(void);
 
 // Reverse Polish Calculator
 int main(void)
@@ -31,10 +40,22 @@ int main(void)
         double op2;
         char s[MAXOP];  // buffer to store characters from input
 
+        printf("RPN Calculator: Enter Input in Reverse Polish Notation\n\n");
+
         while ((type = getop(s)) != EOF) {
+                print_stack();
                 switch(type) {
                         case NUMBER:
                                 push(atof(s));
+                                break;
+                        case TOP:
+                                top();
+                                break;
+                        case DUP:
+                                dup();
+                                break;
+                        case SWAP:
+                                swap();
                                 break;
                         case '+':
                                 push(pop() + pop());
@@ -68,6 +89,8 @@ int main(void)
                                 break;
                 }
         }
+        printf("\nEND ");
+        print_stack();
         return 0;
 }
 
@@ -77,12 +100,12 @@ int main(void)
 
 // EXTERNAL declarations for push() and pop()
 int sp = 0;
-double val[MAXVAL];
+double val_stack[MAXVAL];
 
 void push(double f)
 {
         if (sp < MAXVAL)
-                val[sp++] = f;
+                val_stack[sp++] = f;
         else
                 printf("Error: Stack full. Can't push %g\n", f);
 }
@@ -90,11 +113,52 @@ void push(double f)
 double pop(void)
 {
         if (sp > 0)
-                return val[--sp];
+                return val_stack[--sp];
         else {
                 printf("Error: stack empty\n");
                 return 0.0;
         }
+}
+
+void print_stack(void)
+{
+        int i;
+        printf("STACK: ");
+        for (i = 0; i < sp; i++)
+                printf("%g ", val_stack[i]);
+        printf("\n");
+}
+void top(void)
+{
+        // Exercise only instructs us to "print" the top, not necessarily
+        // return top for future use.
+        if (sp <= MAXVAL && sp > 0)
+                printf("Top: %g\n", val_stack[(sp - 1)]);
+        else if (sp == 0)
+                printf("Stack empty\n");
+        else
+                printf("Error: stack pointer out of bounds\n");
+}
+
+void dup(void)
+{
+        push(val_stack[sp-1]);
+}
+
+void swap(void)
+{
+        if (sp < 2)
+                printf("Can't swap: less than 2 operands on the stack\n");
+        else {
+                double last = val_stack[sp-1];
+                val_stack[sp-1] = val_stack[sp - 2];
+                val_stack[sp - 2] = last;
+        }
+}
+
+void clear(void)
+{
+        sp = 0;
 }
 
 // getop(): get next operator or operand
