@@ -11,16 +11,36 @@
  * Exercise 4-6. Add commands for handling variables. (It's easy to provide
  * twenty-six variables with single-letter names.) Add a variable for the most
  * recently printed value.
+ *
+ * Exercise 4-7. Write a routine ungets(s) that will push back an entire string
+ * onto the input. Should ungets know about buf and bufp, or should it just use
+ * ungetch?
+ *
+ * Exercise 4-8. Suppose that there will never be more than one character of
+ * pushback. Modify getch and ungetch accordingly.
+ *
+ * Exercise 4-9. Our getch and ungetch do not handle a pushed-back EOF
+ * correctly. Decide what their properties ought to be if an EOF is pushed back,
+ * then implement your design.
+ *
+ * Exercise 4-10. An alternate organization uses getline to read an entire input
+ * line; this makes getch and ungetch unnecessary. Revise the calculator to use
+ * this approach.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <string.h>
 
 #define MAXOP 100
 #define NUMBER '0'
 #define TOP '!'
 #define DUP '@'
 #define SWAP '#'
+#define CLEAR '$'
+#define MATH_LIB_FN '&'
+#define VAR '^'
 
 // declarations for main
 int getop(char[]);
@@ -32,6 +52,8 @@ void top(void);
 void dup(void);
 void swap(void);
 void clear(void);
+// EXERCISE 4-5
+void mathh_eval(char[]);
 
 // Reverse Polish Calculator
 int main(void)
@@ -57,6 +79,12 @@ int main(void)
                         case SWAP:
                                 swap();
                                 break;
+                        case CLEAR:
+                                clear();
+                                break;
+                        case MATH_LIB_FN:
+                                mathh_eval(s);
+                                break;
                         case '+':
                                 push(pop() + pop());
                                 break;
@@ -69,14 +97,14 @@ int main(void)
                                 break;
                         case '/':
                                 op2 = pop();
-                                if (op2 != 0.0)
+                                if (op2)
                                         push(pop() / op2);
                                 else
                                         printf("Error: Zero Division\n");
                                 break;
                         case '%':
                                 mod_op = (int)pop();
-                                if (mod_op != 0)
+                                if (mod_op)
                                         push((float)(((int)pop()) % mod_op));
                                 else
                                         printf("Error: Zero Division\n");
@@ -94,11 +122,9 @@ int main(void)
         return 0;
 }
 
-// push(): Push operand onto stack
-// pop(): Pop operand from stack
+// STACK OPERATIONS
 #define MAXVAL 100      // max stack depth
 
-// EXTERNAL declarations for push() and pop()
 int sp = 0;
 double val_stack[MAXVAL];
 
@@ -142,7 +168,10 @@ void top(void)
 
 void dup(void)
 {
-        push(val_stack[sp-1]);
+        if (sp <= MAXVAL && sp > 0)
+                push(val_stack[sp-1]);
+        else
+                printf("Stack empty\n");
 }
 
 void swap(void)
@@ -161,6 +190,25 @@ void clear(void)
         sp = 0;
 }
 
+void mathh_eval(char s[])
+{
+        double tmp;
+        if (strcmp(s, "pow") == 0 && sp >= 2) {
+                tmp = pop();
+                push(pow(pop(), tmp));
+        } 
+        else if (strcmp(s, "exp") == 0 && sp >= 1)
+                push(exp(pop()));
+        else if (strcmp(s, "log") == 0 && sp >= 1)
+                push(log(pop()));
+        else if (strcmp(s, "sqrt") == 0 && sp >= 1)
+                push(sqrt(pop()));
+        else if (strcmp(s, "print") == 0)
+                print_stack();
+        else
+                printf("Error: unrecognized function or not enough operands on stack to perform %s\n", s);
+}
+
 // getop(): get next operator or operand
 #include <ctype.h>
 
@@ -172,25 +220,44 @@ int getop(char s[])
 {
         int i, c;
 
-        // skip leading white space and check if input char is not a number
+        // skip leading white space
         while ((s[0] = c = getch()) == ' ' || c == '\t')
                 ;
         s[1] = '\0';
 
-        if (!isdigit(c) && c != '.' && c != '-')
+        if (!isalnum(c) && c != '.' && c != '-')
                 return c;
 
-        // collect integer (and fractional if necessary)
         i = 0;
-        // EXERCISE 4-3
+
+        // collect contiguous alphabetical str and return
+        if (isalpha(c)) {
+                if (!isalpha(s[++i] = c = getch())) {
+                        if (c != EOF)
+                                ungetch(c);
+                        s[1] = '\0';
+                        return VAR;
+                } else {
+                        while (isalpha(s[++i] = c = getch()))
+                                ;
+                        if (c != EOF)
+                                ungetch(c);
+                        s[i] = '\0';
+                        return MATH_LIB_FN;
+                }
+        }
+
+        // parse unary/binary minus
         if (c == '-') {
+                // return if binary minus (note assignment to s[])
                 if (!isdigit(s[++i] = c = getch()) && c != '.') {
                         if (c != EOF)
                                 ungetch(c);
                         return s[0];
                 }
         }
-
+        
+        // Input is a number; collect integer and fractional parts
         if (isdigit(c))
                 while (isdigit(s[++i] = c = getch()))
                         ;
@@ -199,7 +266,7 @@ int getop(char s[])
                         ;
 
         s[i] = '\0';
-
+        // push last read character to buffer to read on next call to getop()
         if (c != EOF)
                 ungetch(c);
         return NUMBER;
@@ -225,3 +292,5 @@ void ungetch(int c)
         else
                 buf[bufp++] = c;
 }
+
+
