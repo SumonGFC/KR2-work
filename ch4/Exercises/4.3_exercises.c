@@ -28,11 +28,13 @@
  * this approach.
  */
 
+// All of the below headers have been mentioned in the book thus far
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
+// Identifiers to tokenize input for main()
 #define MAXOP 100
 #define NUMBER '0'
 #define TOP '!'
@@ -46,13 +48,13 @@
 int getop(char[]);
 void push(double);
 double pop(void);
-// EXERCISE 4-4 (declarations)
+// declarations for exercise 4-4
 void print_stack(void);
 void top(void);
 void dup(void);
 void swap(void);
 void clear(void);
-// EXERCISE 4-5
+// declarations for exercise 4-5
 void mathh_eval(char[]);
 
 // Reverse Polish Calculator
@@ -224,12 +226,11 @@ int getop(char s[])
         while ((s[0] = c = getch()) == ' ' || c == '\t')
                 ;
         s[1] = '\0';
-
+        // return if c is +, *, /, \n, or illegal input
         if (!isalnum(c) && c != '.' && c != '-')
                 return c;
 
         i = 0;
-
         // collect contiguous alphabetical str and return
         if (isalpha(c)) {
                 if (!isalpha(s[++i] = c = getch())) {
@@ -249,7 +250,7 @@ int getop(char s[])
 
         // parse unary/binary minus
         if (c == '-') {
-                // return if binary minus (note assignment to s[])
+                // return if binary minus (note assignment to s[1] is still executed)
                 if (!isdigit(s[++i] = c = getch()) && c != '.') {
                         if (c != EOF)
                                 ungetch(c);
