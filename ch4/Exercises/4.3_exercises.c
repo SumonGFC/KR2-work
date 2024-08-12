@@ -37,18 +37,21 @@
 // Identifiers to tokenize input for main()
 #define MAXOP 100
 #define NUMBER '0'
+#define STACK_OP '?'
+#define PRINT '~'
 #define TOP '!'
 #define DUP '@'
 #define SWAP '#'
 #define CLEAR '$'
-#define MATH_LIB_FN '&'
-#define VAR '^'
+#define MATH_LIB_FN '^'
+#define VAR '&'
 
 // declarations for main
 int getop(char[]);
 void push(double);
 double pop(void);
 // declarations for exercise 4-4
+void stack_op(char[2]);
 void print_stack(void);
 void top(void);
 void dup(void);
@@ -64,25 +67,16 @@ int main(void)
         double op2;
         char s[MAXOP];  // buffer to store characters from input
 
-        printf("RPN Calculator: Enter Input in Reverse Polish Notation\n\n");
-
+        printf("RPN Calculator: Enter Input in Reverse Polish Notation\n");
+        printf("prnt: ~, top: !, dup: @, swap: #, clear: $\n\n");
         while ((type = getop(s)) != EOF) {
-                print_stack();
+                // print_stack();
                 switch(type) {
                         case NUMBER:
                                 push(atof(s));
                                 break;
-                        case TOP:
-                                top();
-                                break;
-                        case DUP:
-                                dup();
-                                break;
-                        case SWAP:
-                                swap();
-                                break;
-                        case CLEAR:
-                                clear();
+                        case STACK_OP:
+                                stack_op(s);
                                 break;
                         case MATH_LIB_FN:
                                 mathh_eval(s);
@@ -112,7 +106,9 @@ int main(void)
                                         printf("Error: Zero Division\n");
                                 break;
                         case '\n':
-                                printf("\t%.8g\n", pop());
+                                printf("\n\tRESULT: ");
+                                top();
+                                //printf("\tRESULT: %.8g\n", pop());
                                 break;
                         default:
                                 printf("Error: Unknown command %s\n", s);
@@ -120,7 +116,6 @@ int main(void)
                 }
         }
         printf("\nEND ");
-        print_stack();
         return 0;
 }
 
@@ -148,6 +143,31 @@ double pop(void)
         }
 }
 
+void stack_op(char s[2])
+{
+        char c = s[0];
+        switch(c) {
+                case PRINT:
+                        print_stack();
+                        break;
+                case TOP:
+                        top();
+                        break;
+                case DUP:
+                        dup();
+                        break;
+                case SWAP:
+                        swap();
+                        break;
+                case CLEAR:
+                        clear();
+                        break;
+                default:
+                        printf("stack_op() error: OOPS! This shouldn't have happened\n");
+                        break;
+        }
+}
+
 void print_stack(void)
 {
         int i;
@@ -161,7 +181,7 @@ void top(void)
         // Exercise only instructs us to "print" the top, not necessarily
         // return top for future use.
         if (sp <= MAXVAL && sp > 0)
-                printf("Top: %g\n", val_stack[(sp - 1)]);
+                printf("TOP: %g\n", val_stack[(sp - 1)]);
         else if (sp == 0)
                 printf("Stack empty\n");
         else
@@ -205,8 +225,6 @@ void mathh_eval(char s[])
                 push(log(pop()));
         else if (strcmp(s, "sqrt") == 0 && sp >= 1)
                 push(sqrt(pop()));
-        else if (strcmp(s, "print") == 0)
-                print_stack();
         else
                 printf("Error: unrecognized function or not enough operands on stack to perform %s\n", s);
 }
@@ -226,11 +244,18 @@ int getop(char s[])
         while ((s[0] = c = getch()) == ' ' || c == '\t')
                 ;
         s[1] = '\0';
-        // return if c is +, *, /, \n, or illegal input
+
+        // handle stack operation
+        if (c == PRINT || c == TOP || c == DUP || c == SWAP || c == CLEAR) {
+                return STACK_OP;
+        }
+
+        // return if c is +, *, /, \n, or other illegal input
         if (!isalnum(c) && c != '.' && c != '-')
                 return c;
 
         i = 0;
+
         // collect contiguous alphabetical str and return
         if (isalpha(c)) {
                 if (!isalpha(s[++i] = c = getch())) {
