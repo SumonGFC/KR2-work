@@ -28,11 +28,15 @@
  * this approach.
  */
 
+// TODO: VERIFY 'islower()' CLAUSE IN getop()
+// TODO: IMPLEMENT VAR/ASSIGNMENT LOGIC IN MAIN AND MAIN HELPER FUNCTIONS
+
 // All of the below headers have been mentioned in the book thus far
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <ctype.h>
 
 // Identifiers to tokenize input for main()
 #define MAXOP 100
@@ -45,6 +49,7 @@
 #define CLEAR '$'
 #define MATH_LIB_FN '^'
 #define VAR '&'
+#define ASSIGN '='
 
 // declarations for main
 int getop(char[]);
@@ -59,6 +64,9 @@ void swap(void);
 void clear(void);
 // declarations for exercise 4-5
 void mathh_eval(char[]);
+// declarations for exercise 4-6
+double var_to_val(char[2]);
+void assign_eval(char[]);
 
 // Reverse Polish Calculator
 int main(void)
@@ -70,7 +78,6 @@ int main(void)
         printf("RPN Calculator: Enter Input in Reverse Polish Notation\n");
         printf("prnt: ~, top: !, dup: @, swap: #, clear: $\n\n");
         while ((type = getop(s)) != EOF) {
-                // print_stack();
                 switch(type) {
                         case NUMBER:
                                 push(atof(s));
@@ -80,6 +87,10 @@ int main(void)
                                 break;
                         case MATH_LIB_FN:
                                 mathh_eval(s);
+                                break;
+                        case VAR:
+                                break;
+                        case ASSIGN:
                                 break;
                         case '+':
                                 push(pop() + pop());
@@ -111,7 +122,7 @@ int main(void)
                                 //printf("\tRESULT: %.8g\n", pop());
                                 break;
                         default:
-                                printf("Error: Unknown command %s\n", s);
+                                printf("Syntax Error: bad input: %s\n", s);
                                 break;
                 }
         }
@@ -124,6 +135,9 @@ int main(void)
 
 int sp = 0;
 double val_stack[MAXVAL];
+const char var_arr[26] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+float var_vals[26] = { 0.0 };
 
 void push(double f)
 {
@@ -143,6 +157,7 @@ double pop(void)
         }
 }
 
+// execute specified stack operation
 void stack_op(char s[2])
 {
         char c = s[0];
@@ -176,6 +191,7 @@ void print_stack(void)
                 printf("%g ", val_stack[i]);
         printf("\n");
 }
+
 void top(void)
 {
         // Exercise only instructs us to "print" the top, not necessarily
@@ -212,6 +228,7 @@ void clear(void)
         sp = 0;
 }
 
+// evaluate math.h function according to s[]
 void mathh_eval(char s[])
 {
         double tmp;
@@ -229,8 +246,11 @@ void mathh_eval(char s[])
                 printf("Error: unrecognized function or not enough operands on stack to perform %s\n", s);
 }
 
+double var_to_val(char[2]);
+int valid_assign(void);
+void assign_eval(char[]);
+
 // getop(): get next operator or operand
-#include <ctype.h>
 
 // declarations for getop
 int getch(void);
@@ -245,6 +265,10 @@ int getop(char s[])
                 ;
         s[1] = '\0';
 
+        // Guard clause; no uppercase vars, bad assignment syntax
+        if (isupper(c) || c == '=')
+                return 0;
+
         // handle stack operation
         if (c == PRINT || c == TOP || c == DUP || c == SWAP || c == CLEAR) {
                 return STACK_OP;
@@ -256,20 +280,26 @@ int getop(char s[])
 
         i = 0;
 
-        // collect contiguous alphabetical str and return
-        if (isalpha(c)) {
-                if (!isalpha(s[++i] = c = getch())) {
-                        if (c != EOF)
-                                ungetch(c);
-                        s[1] = '\0';
-                        return VAR;
-                } else {
-                        while (isalpha(s[++i] = c = getch()))
+        // handle alphabetic inputs: variable/assignment, math.h lib function
+        if (islower(c)) {
+                s[++i] = c = getch();
+                if (c == '=') {
+                        s[++i] = '\0';
+                        return ASSIGN;
+                }
+                else if (islower(c)) {
+                        while (islower(s[++i] = c = getch()))
                                 ;
                         if (c != EOF)
                                 ungetch(c);
                         s[i] = '\0';
                         return MATH_LIB_FN;
+                }
+                else {
+                        s[1] = '\0';
+                        if (c != EOF)
+                                ungetch(c);
+                        return VAR;
                 }
         }
 
