@@ -66,7 +66,8 @@ void clear(void);
 void mathh_eval(char[]);
 // declarations for exercise 4-6
 double var_to_val(char[2]);
-void assign_eval(char[]);
+void assign_var(char[3]);
+void print_vars(void);
 
 // Reverse Polish Calculator
 int main(void)
@@ -89,8 +90,11 @@ int main(void)
                                 mathh_eval(s);
                                 break;
                         case VAR:
+                                push(var_to_val(s));
                                 break;
                         case ASSIGN:
+                                assign_var(s);
+                                print_vars();
                                 break;
                         case '+':
                                 push(pop() + pop());
@@ -135,9 +139,6 @@ int main(void)
 
 int sp = 0;
 double val_stack[MAXVAL];
-const char var_arr[26] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-        'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
-float var_vals[26] = { 0.0 };
 
 void push(double f)
 {
@@ -246,9 +247,29 @@ void mathh_eval(char s[])
                 printf("Error: unrecognized function or not enough operands on stack to perform %s\n", s);
 }
 
-double var_to_val(char[2]);
-int valid_assign(void);
-void assign_eval(char[]);
+float var_vals[26] = { 0.0 };
+
+void print_vars(void)
+{
+        int i;
+        for (i = 'a'; i <= 'z'; i++)
+                printf("%c: %g, ", i, var_vals[i - 'a']);
+        printf("\n");
+}
+
+double var_to_val(char s[2])
+{
+        return var_vals[s[0] - 'a'];
+}
+void assign_var(char s[3])
+{
+        if (sp < 1)
+                printf("Error: stack empty; can't assign %s\n", s);
+        else {
+                var_vals[s[0] - 'a'] = val_stack[(sp - 1)];
+                printf("variable '%c' assigned %g\n", s[0], val_stack[(sp - 1)]);
+        }
+}
 
 // getop(): get next operator or operand
 
@@ -260,16 +281,16 @@ int getop(char s[])
 {
         int i, c;
 
-        // skip leading white space
+        // skip leading white space and read first char into s[]
         while ((s[0] = c = getch()) == ' ' || c == '\t')
                 ;
         s[1] = '\0';
 
-        // Guard clause; no uppercase vars, bad assignment syntax
+        // Guard clause: no uppercase vars, bad assignment syntax
         if (isupper(c) || c == '=')
                 return 0;
 
-        // handle stack operation
+        // handle stack op
         if (c == PRINT || c == TOP || c == DUP || c == SWAP || c == CLEAR) {
                 return STACK_OP;
         }
@@ -280,7 +301,7 @@ int getop(char s[])
 
         i = 0;
 
-        // handle alphabetic inputs: variable/assignment, math.h lib function
+        // handle alphabetic inputs: variable/assignment, math.h function
         if (islower(c)) {
                 s[++i] = c = getch();
                 if (c == '=') {
