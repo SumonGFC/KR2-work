@@ -1,14 +1,14 @@
-/* Exercise 4-3. Given the basic framework, it's straightforward to extend the
+/* Exercise 4-3(DONE). Given the basic framework, it's straightforward to extend the
  * calculator. Add the modulus (%) operator and provisions for negative numbers.
  *
- * Exercise 4-4. Add the commands to print the top elements of the stack
+ * Exercise 4-4(DONE). Add the commands to print the top elements of the stack
  * without popping, to duplicate it, and to swap the top two elements. Add a
  * command to clear the stack.
  *
- * Exercise 4-5. Add access to library functions like sin, exp, and pow. See
+ * Exercise 4-5(DONE). Add access to library functions like sin, exp, and pow. See
  * <math.h> in Appendix B, Section 4.
  *
- * Exercise 4-6. Add commands for handling variables. (It's easy to provide
+ * Exercise 4-6(DONE). Add commands for handling variables. (It's easy to provide
  * twenty-six variables with single-letter names.) Add a variable for the most
  * recently printed value.
  *
@@ -28,8 +28,7 @@
  * this approach.
  */
 
-// TODO: VERIFY 'islower()' CLAUSE IN getop()
-// TODO: IMPLEMENT VAR/ASSIGNMENT LOGIC IN MAIN AND MAIN HELPER FUNCTIONS
+// TODO: exercises 4-7 to 4-10
 
 // All of the below headers have been mentioned in the book thus far
 #include <stdio.h>
