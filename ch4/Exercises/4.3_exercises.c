@@ -28,6 +28,9 @@
  * this approach.
  */
 
+// COMPILE WITH:
+// gcc ch4/Exercises/4.3_exercises.c -lm -Wall -Wextra -pedantic && ./a.out
+
 // TODO: exercises 4-7 to 4-10
 
 // All of the below headers have been mentioned in the book thus far
