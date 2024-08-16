@@ -6,8 +6,8 @@
 // STACK OPERATIONS
 #define MAXVAL 100      // max stack depth
 
-int sp = 0;
-double val_stack[MAXVAL];
+static int sp = 0;
+static double val_stack[MAXVAL];
 
 void push(double f)
 {
