@@ -181,25 +181,26 @@ C standard guarantees that 0x0 is never a valid address for data
 Pointers and Integers are NOT interchangeable. 0x0 is the sole exception. The 
 constant 0 may be assigned or compared with a pointer. The symbolic constant
 `NULL` is often used in place of 0 when assigning the value `0` to a pointer
-variable. (tl;dr use `NULL` when assigning the void pointer).
+variable, as a mnemonic -- use `NULL` to indicate a pointer is pointing to `0`,
+i.e. nothing.
 
 Pointers may be compared under certain conditions:
-    - If `p` and `q` point to members of the same array, then we can compare
-      them via ==, <=, !=, etc.
+- If `p` and `q` point to members of the same array, then we can compare
+them via ==, <=, !=, etc.
 
-    - can compare any pointer with 0
+- can compare any pointer with 0
 
-    - UB: comparison with pointers that point to elements of DIFFERENT arrays
-        - Exception: the address of the first element past the end of an array
-          can be used in pointer arithmetic.
+- UB: comparison with pointers that point to elements of DIFFERENT arrays
+    - Exception: the address of the first element past the end of an array
+    can be used in pointer arithmetic.
 
-    - pointers may be added or subtracted. If `p` is a pointer to an array,
-      then `p + n` will point to the nth object in the array. `n` will be
-      scaled according to the size/type of the object that `p` points to.
+- pointers may be added or subtracted. if `p` is a pointer to an array,
+then `p + n` will point to the nth object in the array. `n` will be
+scaled according to the size/type of the object that `p` points to.
 
-    - Pointer subtraction is also valid. If `p` and `q` point to elements of the
-      same array with `q` > `p`, then `q - p + 1` gives us the number of objects
-      between `q` and `p`.
+- Pointer subtraction is also valid. If `p` and `q` point to elements of the
+same array with `q` > `p`, then `q - p + 1` gives us the number of objects
+between `q` and `p`.
 
 With the last point, we can wrie another version of `strlen`:
 ```c
@@ -235,17 +236,17 @@ pointer points to.
 TL;DR
 
 LEGAL POINTER OPS:
-    - assignment of pointers to pointer vars of the same type
-    - adding/subtracting an pointers and ints
-    - comparing/subtracting two pointers that point to objects in same array
-    - assignment of one pointer to a `void *`
-    - case pointer to another type
+- assignment of pointers to pointer vars of the same type
+- adding/subtracting an pointers and ints
+- comparing/subtracting two pointers that point to objects in same array
+- assignment of one pointer to a `void *`
+- case pointer to another type
 
 ILLEGAL OPS:
-    - add two pointers
-    - multiply, divide, shift, or mask 2 pointers
-    - add `float` or `double` to a pointer
-    - assign a pointer of one type to a pointer of another type
-        - except to `void *` or casting before assignment
+- add two pointers
+- multiply, divide, shift, or mask 2 pointers
+- add `float` or `double` to a pointer
+- assign a pointer of one type to a pointer of another type
+    - except to `void *` or casting before assignment
 
 
