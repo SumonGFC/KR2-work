@@ -249,4 +249,45 @@ ILLEGAL OPS:
 - assign a pointer of one type to a pointer of another type
     - except to `void *` or casting before assignment
 
+#### Simple Storage Allocator
+To illustrate the above notes, write a simple storage allocator:
+- Routine: `alloc(n)` returns pointer to `n` consecutive character positions,
+which can be used by callers of `alloc` to store characters.
+- Routine: `afree(p)` releases the store allocated by `alloc` so that it can be
+used later.
 
+The storage allocated/removed by these routines is LIFO (i.e. a stack). Note
+that we *MUST* call `alloc` and `afree` like this:
+```c
+a = alloc(10);
+b = alloc(10);
+c = alloc(20);
+
+afree(c);
+afree(b);
+afree(a);
+```
+Otherwise these routines will not really work well (UB).
+
+```c
+# define ALLOCSIZE 10000
+
+static char allocbuff[ALLOCSIZE];
+static char *allocp = allocbuff;
+
+char *alloc(int n)
+{
+    // start + length - current_position == allocatable space
+    if (allocbuff + ALLOCSIZE - allocp >= n) {
+        allocp += n;
+        return allocp - n;  // return position of original pointer
+    } else
+        return 0;
+}
+
+void afree(char *p)
+{
+    if (p >= allocbuff && p <= allocbuff + ALLOCSIZE)
+        allocp = p;
+}
+```
