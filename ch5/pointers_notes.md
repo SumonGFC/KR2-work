@@ -291,3 +291,61 @@ void afree(char *p)
         allocp = p;
 }
 ```
+
+# SECTION 5.5: CHARACTER POINTERS AND FUNCTIONS
+The length in storage of a string literal is *ONE MORE*  than the number of
+characters between the double quotes.
+
+When we pass in a string constant to a function:
+```c
+printf("hello, world\n"); 
+```
+what gets passed to it is a pointer to the beginning of the char array. It is
+accessed via pointer to the first element.
+
+Another way to store a string constant in a variable:
+```c
+char *pmessage;
+pmessage = "now is the time";
+```
+This assigns to `pmessage` the pointer of the first character of the string
+constant (i.e. array). There is a difference between these 2:
+```c
+char amessage[] = "now is the time";    // an array
+char *pmessage = "now is the time";     // a pointer to an array
+```
+here, `amessage` is just an array, exactly big enough to hold the string
+characters plus the null terminator -- the symbol `amessage` will always refer
+to the same storage. `pmessage` is a pointer variable and may be changed to
+point to something else, perhaps another position in the array or perhaps to
+another object (char) entirely.
+    - NOTE: UB if we try to modify the string array via pointer.
+
+#### Example: strcpy
+Consider these implementation:
+```c
+void arr_strcpy(char *src, char *dst)
+{
+    int i = 0;
+    while ((dst[i] = src[i]) != '\0')
+        i++;
+}
+
+void ptr_strcpy(char *src, char *dst)   // arguments copied into local variables
+{
+    // this is ridiculous. But there is an obvious overflow error in this
+    // If length of dst < length of src, we get UB
+    while (*dst++ = *src++)
+        ;
+}
+```
+#### Example: strcmp
+```c
+// return < 0 if s < t, 0 if s == t, or > 0 if s > t
+int strcmp(char *s, char *t)
+{
+    for (; *s == *t; s++, t++)
+        if (*s == '\0')
+            return 0;
+    return *s - *t; // lexicographical ordering
+}
