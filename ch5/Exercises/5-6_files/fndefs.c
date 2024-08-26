@@ -45,16 +45,25 @@ int my_atoi(const char *str)
 
 char *my_itoa(int num, char *buff)
 {
+        char *bp = buff;
         int i = 0;
         int sign = (num < 0) ? -1 : 1;
+
         if (sign < 0) {
                 num = -num;
-                *(buff + (i++)) = '-';
+                *bp++ = '-';
         }
         while (num > 0) {
-                *(buff + (i++)) = (num % 10) + '0';
+                *bp++ = (num % 10) + '0'; 
                 num /= 10;
         }
+        *bp = '\0';
 
+        char *bp_left = (sign < 0) ? buff + 1 : buff;
+        while (bp_left < bp) {
+                int tmp = *bp_left;
+                *bp_left++ = *--bp;
+                *bp = tmp;
+        }
         return buff;
 }
