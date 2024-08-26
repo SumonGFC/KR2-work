@@ -1,6 +1,6 @@
 // Rewrite appropriate programs from earlier chapters and exercises with
 // pointers instead of array indexing. Good possibilities include getline
-// (Chapters 1 and 4), atoi, itoa, and their variants (Chapters 2, 3, and 4),
+// (Chapters 1 and 4), my_atoi, my_itoa, and their variants (Chapters 2, 3, and 4),
 // reverse (Chapter 3), and strindex and getop (Chapter 4).
 
 #include <limits.h>
@@ -22,7 +22,7 @@ int my_getline(char *buff, size_t size)
         return i;
 }
 
-int atoi(const char *str)
+int my_atoi(const char *str)
 {
         int num, digit, sign;
 
@@ -43,7 +43,7 @@ int atoi(const char *str)
         return sign * num;
 }
 
-char *itoa(int num, char *buff)
+char *my_itoa(int num, char *buff)
 {
         int i = 0;
         int sign = (num < 0) ? -1 : 1;
