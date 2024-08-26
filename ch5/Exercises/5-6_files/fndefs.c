@@ -67,3 +67,9 @@ char *my_itoa(int num, char *buff)
         }
         return buff;
 }
+
+//int main(void)
+//{
+//        char buff[100];
+//        printf("%s\n", my_itoa(-123, buff));
+//}
