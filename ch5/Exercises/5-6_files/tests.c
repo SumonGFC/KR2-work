@@ -2,6 +2,7 @@
 #include <limits.h>
 #include "fndecs.h"
 
+#define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
@@ -18,6 +19,7 @@ void my_getline_test(void) {}
 
 void my_atoi_test(void)
 {
+        printf(ANSI_COLOR_CYAN"ATOI TESTS:\n"ANSI_COLOR_RESET);
         char empty[] = "";
         char pure_num[] = "123";
         char alpha[] = "asdf";
