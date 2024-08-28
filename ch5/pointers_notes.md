@@ -349,3 +349,17 @@ int strcmp(char *s, char *t)
             return 0;
     return *s - *t; // lexicographical ordering
 }
+```
+
+# SECTION 5.6: POINTER ARRAYS; POINTERS TO POINTERS
+
+Array of pointers:
+```c
+int *arr[]; // array of pointers to ints
+```
+Pointer to pointer:
+```c
+int **ppi;  // ppi is a pointer to a pointer to an int
+```
+
+See the 5.6 files for the code of the program outlined in this chapter.
